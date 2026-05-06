@@ -28,7 +28,7 @@ function playSound(src, volume = 0.5) {
     s.play().catch(() => { });
 }
 
-// ================= SHOOT =================
+// ================= SHOOT (NO SOUND) =================
 function shoot() {
     if (!gameRunning || !canShoot) return;
 
@@ -37,7 +37,7 @@ function shoot() {
         y: planeY
     });
 
-    playSound("sound/tembakan.mp3", 0.4);
+    // ❌ tidak ada sound tembak
 
     canShoot = false;
     setTimeout(() => canShoot = true, 180);
@@ -47,14 +47,14 @@ function shoot() {
 window.addEventListener("keydown", e => {
     keys[e.keyCode] = true;
 
-    if (e.keyCode === 32) shoot();
+    if (e.keyCode === 32) shoot(); // SPACE
 });
 
 window.addEventListener("keyup", e => {
     keys[e.keyCode] = false;
 });
 
-// ================= TOUCH (FIX SMOOTH HP) =================
+// ================= TOUCH (HP SMOOTH CONTROL) =================
 let lastTouchX = 0;
 let lastTouchY = 0;
 
@@ -74,7 +74,6 @@ area.addEventListener("touchmove", e => {
     let dx = t.clientX - lastTouchX;
     let dy = t.clientY - lastTouchY;
 
-    // 🔥 smoothing (biar tidak patah-patah)
     planeX += dx * 0.5;
     planeY += dy * 0.5;
 
@@ -89,7 +88,7 @@ setInterval(() => {
     if (!gameRunning) return;
 
     meteors.push({
-        x: Math.random() * 340,
+        x: Math.random() * (area.clientWidth - 60),
         y: -50,
         speed: METEOR_SPEED_MIN + Math.random() * METEOR_SPEED_MAX
     });
@@ -102,7 +101,7 @@ function update() {
 
     if (!gameRunning) return;
 
-    // ================= KEY MOVE (SMOOTH FIX) =================
+    // ================= KEY MOVE =================
     let speed = 4;
 
     if (keys[37]) planeX -= speed;
@@ -155,7 +154,7 @@ function update() {
             planeY < m.y + 70 &&
             planeY + 70 > m.y
         ) {
-            playSound("sounds/boom.mp3", 0.7);
+            playSound("sound/tembakan.mp3", 0.7);
             gameOver();
         }
 
@@ -172,7 +171,8 @@ function update() {
                 score += 10;
                 scoreEl.innerText = score;
 
-                playSound("sound/tembakan.mp3", 0.5);
+                // 🔊 ONLY HIT SOUND
+                playSound("sound/shod.mp3", 0.6);
 
                 m.el.remove();
                 b.el.remove();
