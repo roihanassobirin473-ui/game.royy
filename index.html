@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Adventure</title>
+
+    <style>
+        /* ================= RESET ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ================= BODY ================= */
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-family: Arial, sans-serif;
+            color: white;
+
+            background: radial-gradient(circle at top, #0a0a0a, #000);
+            overflow: hidden;
+        }
+
+        /* ================= STARS ================= */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 35px 35px;
+            animation: starMove 18s linear infinite;
+            opacity: 0.2;
+
+            pointer-events: none;
+            /* ✅ FIX UTAMA */
+        }
+
+        /* ================= GLOW ORBS ================= */
+        body::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 30% 30%, rgba(0, 255, 255, 0.15), transparent 40%),
+                radial-gradient(circle at 70% 70%, rgba(255, 0, 255, 0.15), transparent 40%);
+            animation: pulse 6s ease-in-out infinite;
+
+            pointer-events: none;
+            /* ✅ FIX UTAMA */
+        }
+
+        /* ================= ANIMASI BACKGROUND ================= */
+        @keyframes starMove {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-600px);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ================= CARD ================= */
+        #home {
+            position: relative;
+            z-index: 10;
+
+            text-align: center;
+            padding: 50px 60px;
+
+            border-radius: 25px;
+
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(12px);
+
+            border: 1px solid rgba(0, 255, 255, 0.4);
+
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.4);
+
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-12px);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        /* ================= TITLE ================= */
+        h1 {
+            font-size: 45px;
+            margin-bottom: 25px;
+
+            background: linear-gradient(90deg, cyan, magenta, blue);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                filter: brightness(1);
+            }
+
+            to {
+                filter: brightness(1.5);
+            }
+        }
+
+        /* ================= BUTTON ================= */
+        button {
+            position: relative;
+            z-index: 11;
+
+            padding: 14px 40px;
+            font-size: 18px;
+
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+
+            color: white;
+            background: linear-gradient(45deg, #00ffff, #0066ff);
+
+            box-shadow: 0 0 25px cyan;
+
+            transition: 0.3s;
+            overflow: hidden;
+        }
+
+        /* shine effect */
+        button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: skewX(-20deg);
+            transition: 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px magenta;
+        }
+
+        /* ================= ROCKET ================= */
+        .rocket {
+            position: absolute;
+            font-size: 35px;
+            animation: fly 6s linear infinite;
+
+            pointer-events: none;
+        }
+
+        @keyframes fly {
+            0% {
+                transform: translateY(0);
+                left: -50px;
+            }
+
+            100% {
+                transform: translateY(600px);
+                left: 110%;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="rocket">🚀</div>
+
+    <div id="home">
+        <h1>SPACE ADVENTURE</h1>
+        <button onclick="startGame()">▶ START GAME</button>
+    </div>
+
+    <audio id="homeMusic" loop>
+        <source src="sound/kicau.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        let music = document.getElementById("homeMusic");
+
+        // play music sekali klik user
+        window.addEventListener("click", () => {
+            music.play().catch(() => { });
+        }, { once: true });
+
+        function startGame() {
+            music.pause();
+            window.location.href = "game.html";
+        }
+    </script>
+
+</body>
+
+</html>
