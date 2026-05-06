@@ -3,7 +3,6 @@ let scoreEl = document.getElementById("score");
 let area = document.getElementById("area");
 let restartBtn = document.getElementById("restartBtn");
 
-// ================= GAME STATE =================
 let score = 0;
 let gameRunning = true;
 
@@ -16,15 +15,10 @@ let meteors = [];
 let keys = {};
 let canShoot = true;
 
-// ================= SETTING =================
-let METEOR_SPEED_MIN = 1;
-let METEOR_SPEED_MAX = 3;
-let METEOR_SPAWN_TIME = 900;
-
-// ================= SOUND =================
-function playSound(src, volume = 0.5) {
+// ================= SOUND (SAFE) =================
+function playSound(src) {
     let s = new Audio(src);
-    s.volume = volume;
+    s.volume = 0.5;
     s.play().catch(() => { });
 }
 
@@ -37,31 +31,29 @@ function shoot() {
         y: planeY
     });
 
-    // ❌ tidak ada sound tembak
-
     canShoot = false;
-    setTimeout(() => canShoot = true, 180);
+    setTimeout(() => canShoot = true, 200);
 }
 
 // ================= KEYBOARD =================
 window.addEventListener("keydown", e => {
     keys[e.keyCode] = true;
 
-    if (e.keyCode === 32) shoot(); // SPACE
+    if (e.keyCode === 32) shoot();
 });
 
 window.addEventListener("keyup", e => {
     keys[e.keyCode] = false;
 });
 
-// ================= TOUCH (HP SMOOTH CONTROL) =================
-let lastTouchX = 0;
-let lastTouchY = 0;
+// ================= TOUCH (SMOOTH SIMPLE) =================
+let lastX = 0;
+let lastY = 0;
 
 area.addEventListener("touchstart", e => {
     let t = e.touches[0];
-    lastTouchX = t.clientX;
-    lastTouchY = t.clientY;
+    lastX = t.clientX;
+    lastY = t.clientY;
 
     shoot();
 });
@@ -71,14 +63,14 @@ area.addEventListener("touchmove", e => {
 
     let t = e.touches[0];
 
-    let dx = t.clientX - lastTouchX;
-    let dy = t.clientY - lastTouchY;
+    let dx = t.clientX - lastX;
+    let dy = t.clientY - lastY;
 
-    planeX += dx * 0.5;
-    planeY += dy * 0.5;
+    planeX += dx;
+    planeY += dy;
 
-    lastTouchX = t.clientX;
-    lastTouchY = t.clientY;
+    lastX = t.clientX;
+    lastY = t.clientY;
 
     e.preventDefault();
 }, { passive: false });
@@ -90,10 +82,10 @@ setInterval(() => {
     meteors.push({
         x: Math.random() * (area.clientWidth - 60),
         y: -50,
-        speed: METEOR_SPEED_MIN + Math.random() * METEOR_SPEED_MAX
+        speed: 2 + Math.random() * 2
     });
 
-}, METEOR_SPAWN_TIME);
+}, 1000);
 
 // ================= GAME LOOP =================
 function update() {
@@ -101,13 +93,11 @@ function update() {
 
     if (!gameRunning) return;
 
-    // ================= KEY MOVE =================
-    let speed = 4;
-
-    if (keys[37]) planeX -= speed;
-    if (keys[39]) planeX += speed;
-    if (keys[38]) planeY -= speed;
-    if (keys[40]) planeY += speed;
+    // move keyboard
+    if (keys[37]) planeX -= 4;
+    if (keys[39]) planeX += 4;
+    if (keys[38]) planeY -= 4;
+    if (keys[40]) planeY += 4;
 
     // batas layar
     planeX = Math.max(0, Math.min(area.clientWidth - 80, planeX));
@@ -147,18 +137,18 @@ function update() {
         m.el.style.left = m.x + "px";
         m.el.style.top = m.y + "px";
 
-        // ================= HIT PLAYER =================
+        // HIT PLAYER
         if (
             planeX < m.x + 60 &&
             planeX + 70 > m.x &&
             planeY < m.y + 70 &&
             planeY + 70 > m.y
         ) {
-            playSound("sound/tembakan.mp3", 0.7);
+            playSound("sound/boom.mp3");
             gameOver();
         }
 
-        // ================= HIT BULLET =================
+        // HIT BULLET
         for (let j = bullets.length - 1; j >= 0; j--) {
             let b = bullets[j];
 
@@ -171,8 +161,8 @@ function update() {
                 score += 10;
                 scoreEl.innerText = score;
 
-                // 🔊 ONLY HIT SOUND
-                playSound("sound/shod.mp3", 0.6);
+                // 🔊 hanya saat kena
+                playSound("sound/tembakan.mp3");
 
                 m.el.remove();
                 b.el.remove();
@@ -184,14 +174,12 @@ function update() {
             }
         }
 
-        // remove meteor keluar layar
         if (m.y > area.clientHeight + 50) {
             m.el.remove();
             meteors.splice(i, 1);
         }
     }
 
-    // ================= UPDATE PLANE =================
     plane.style.left = planeX + "px";
     plane.style.top = planeY + "px";
 }
@@ -202,10 +190,7 @@ function gameOver() {
     restartBtn.style.display = "block";
 }
 
-// ================= RESTART =================
-restartBtn.onclick = () => {
-    location.reload();
-};
+// restart
+restartBtn.onclick = () => location.reload();
 
-// START GAME
 update();
