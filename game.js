@@ -7,22 +7,19 @@ let restartBtn = document.getElementById("restartBtn");
 let score = 0;
 let gameRunning = true;
 
-// posisi pesawat
 let planeX = 160;
 let planeY = 400;
 
-// object
 let bullets = [];
 let meteors = [];
 
-// kontrol
 let keys = {};
 let canShoot = true;
 
-// ================= SETTING GAME (INI PENTING) =================
-let METEOR_SPEED_MIN = 1;   // 🔥 kecepatan paling lambat meteor
-let METEOR_SPEED_MAX = 4;   // 🔥 kecepatan paling cepat meteor
-let METEOR_SPAWN_TIME = 1000; // 🔥 tiap berapa ms meteor muncul
+// ================= SETTING =================
+let METEOR_SPEED_MIN = 1;
+let METEOR_SPEED_MAX = 3;
+let METEOR_SPAWN_TIME = 900;
 
 // ================= SOUND =================
 function playSound(src, volume = 0.5) {
@@ -33,52 +30,59 @@ function playSound(src, volume = 0.5) {
 
 // ================= SHOOT =================
 function shoot() {
-    if (!gameRunning) return;
-    if (!canShoot) return;
+    if (!gameRunning || !canShoot) return;
 
-    bullets.push({ x: planeX + 30, y: planeY });
+    bullets.push({
+        x: planeX + 30,
+        y: planeY
+    });
 
-    playSound("sound/tembakan.mp3", 0.5);
+    playSound("sound/tembakan.mp3", 0.4);
 
     canShoot = false;
-    setTimeout(() => canShoot = true, 150);
+    setTimeout(() => canShoot = true, 180);
 }
 
 // ================= KEYBOARD =================
 window.addEventListener("keydown", e => {
     keys[e.keyCode] = true;
 
-    if (e.keyCode === 32) shoot(); // SPACE
+    if (e.keyCode === 32) shoot();
 });
 
 window.addEventListener("keyup", e => {
     keys[e.keyCode] = false;
 });
 
-// ================= TOUCH (HP) =================
-let touchX = 0;
-let touchY = 0;
+// ================= TOUCH (FIX SMOOTH HP) =================
+let lastTouchX = 0;
+let lastTouchY = 0;
 
 area.addEventListener("touchstart", e => {
     let t = e.touches[0];
-    touchX = t.clientX;
-    touchY = t.clientY;
+    lastTouchX = t.clientX;
+    lastTouchY = t.clientY;
 
     shoot();
 });
 
 area.addEventListener("touchmove", e => {
+    if (!gameRunning) return;
+
     let t = e.touches[0];
 
-    let dx = t.clientX - touchX;
-    let dy = t.clientY - touchY;
+    let dx = t.clientX - lastTouchX;
+    let dy = t.clientY - lastTouchY;
 
-    planeX += dx * 0.3;
-    planeY += dy * 0.3;
+    // 🔥 smoothing (biar tidak patah-patah)
+    planeX += dx * 0.5;
+    planeY += dy * 0.5;
 
-    touchX = t.clientX;
-    touchY = t.clientY;
-});
+    lastTouchX = t.clientX;
+    lastTouchY = t.clientY;
+
+    e.preventDefault();
+}, { passive: false });
 
 // ================= METEOR SPAWN =================
 setInterval(() => {
@@ -98,14 +102,17 @@ function update() {
 
     if (!gameRunning) return;
 
-    // MOVE KEYBOARD
-    if (keys[37]) planeX -= 5;
-    if (keys[39]) planeX += 5;
-    if (keys[38]) planeY -= 5;
-    if (keys[40]) planeY += 5;
+    // ================= KEY MOVE (SMOOTH FIX) =================
+    let speed = 4;
 
-    planeX = Math.max(0, Math.min(330, planeX));
-    planeY = Math.max(0, Math.min(420, planeY));
+    if (keys[37]) planeX -= speed;
+    if (keys[39]) planeX += speed;
+    if (keys[38]) planeY -= speed;
+    if (keys[40]) planeY += speed;
+
+    // batas layar
+    planeX = Math.max(0, Math.min(area.clientWidth - 80, planeX));
+    planeY = Math.max(0, Math.min(area.clientHeight - 90, planeY));
 
     // ================= BULLET =================
     for (let i = bullets.length - 1; i >= 0; i--) {
@@ -121,7 +128,7 @@ function update() {
         b.el.style.left = b.x + "px";
         b.el.style.top = b.y + "px";
 
-        if (b.y < 0) {
+        if (b.y < -20) {
             b.el.remove();
             bullets.splice(i, 1);
         }
@@ -141,7 +148,7 @@ function update() {
         m.el.style.left = m.x + "px";
         m.el.style.top = m.y + "px";
 
-        // HIT PLAYER
+        // ================= HIT PLAYER =================
         if (
             planeX < m.x + 60 &&
             planeX + 70 > m.x &&
@@ -152,7 +159,7 @@ function update() {
             gameOver();
         }
 
-        // HIT BULLET
+        // ================= HIT BULLET =================
         for (let j = bullets.length - 1; j >= 0; j--) {
             let b = bullets[j];
 
@@ -165,7 +172,7 @@ function update() {
                 score += 10;
                 scoreEl.innerText = score;
 
-                playSound("sound/tembakan.mp3", 0.7);
+                playSound("sound/tembakan.mp3", 0.5);
 
                 m.el.remove();
                 b.el.remove();
@@ -176,9 +183,15 @@ function update() {
                 break;
             }
         }
+
+        // remove meteor keluar layar
+        if (m.y > area.clientHeight + 50) {
+            m.el.remove();
+            meteors.splice(i, 1);
+        }
     }
 
-    // update pesawat
+    // ================= UPDATE PLANE =================
     plane.style.left = planeX + "px";
     plane.style.top = planeY + "px";
 }
