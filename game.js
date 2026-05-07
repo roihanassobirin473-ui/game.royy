@@ -4,6 +4,12 @@ let area = document.getElementById("area");
 let restartBtn = document.getElementById("restartBtn");
 let main = document.getElementById("main");
 
+// GAME OVER UI
+let gameOverBox = document.getElementById("gameOverBox");
+let finalScore = document.getElementById("finalScore");
+let gameText = document.getElementById("gameText");
+let backHomeBtn = document.getElementById("backHomeBtn");
+
 // ================= GAME STATE =================
 let score = 0;
 let gameRunning = true;
@@ -21,10 +27,19 @@ let bgY = 0;
 
 // ================= SOUND =================
 function playSound(src, volume = 0.5) {
+
     let s = new Audio(src);
+
     s.volume = volume;
+
     s.play().catch(() => { });
+
+    return s;
 }
+
+// ================= SEMBUNYIKAN TOMBOL AWAL =================
+restartBtn.style.display = "none";
+backHomeBtn.style.display = "none";
 
 // ================= SHOOT =================
 function shoot() {
@@ -37,7 +52,7 @@ function shoot() {
         y: planeY
     });
 
-    // sound tembak
+    // SOUND TEMBAK
     playSound("sounds/shoot.mp3", 0.4);
 
     canShoot = false;
@@ -62,7 +77,7 @@ window.addEventListener("keyup", e => {
     keys[e.keyCode] = false;
 });
 
-// ================= TOUCH HP FIX =================
+// ================= TOUCH CONTROL =================
 let touchStartX = 0;
 let touchStartY = 0;
 
@@ -86,7 +101,7 @@ area.addEventListener("touchmove", e => {
     let moveX = t.clientX - touchStartX;
     let moveY = t.clientY - touchStartY;
 
-    // smooth hp control
+    // CONTROL HP LEBIH ENAK
     planeX += moveX * 0.25;
     planeY += moveY * 0.25;
 
@@ -102,14 +117,16 @@ setInterval(() => {
 
     if (!gameRunning) return;
 
-    // maksimal meteor
+    // BATAS METEOR
     if (meteors.length > 5) return;
 
     meteors.push({
+
         x: Math.random() * (area.clientWidth - 60),
+
         y: -80,
 
-        // 🔥 meteor lebih pelan
+        // METEOR LEBIH PELAN
         speed: 1 + Math.random() * 1.5
     });
 
@@ -122,8 +139,9 @@ function update() {
 
     if (!gameRunning) return;
 
-    // ================= BACKGROUND SCROLL =================
+    // ================= BACKGROUND GERAK =================
     bgY += 1.5;
+
     main.style.backgroundPositionY = bgY + "px";
 
     // ================= MOVE KEYBOARD =================
@@ -132,7 +150,7 @@ function update() {
     if (keys[38]) planeY -= 4;
     if (keys[40]) planeY += 4;
 
-    // batas layar
+    // BATAS LAYAR
     planeX = Math.max(0, Math.min(area.clientWidth - 80, planeX));
     planeY = Math.max(0, Math.min(area.clientHeight - 90, planeY));
 
@@ -146,6 +164,7 @@ function update() {
         if (!b.el) {
 
             b.el = document.createElement("div");
+
             b.el.className = "bullet";
 
             area.appendChild(b.el);
@@ -154,10 +173,11 @@ function update() {
         b.el.style.left = b.x + "px";
         b.el.style.top = b.y + "px";
 
-        // hapus peluru
+        // HAPUS PELURU
         if (b.y < -20) {
 
             b.el.remove();
+
             bullets.splice(i, 1);
         }
     }
@@ -172,6 +192,7 @@ function update() {
         if (!m.el) {
 
             m.el = document.createElement("div");
+
             m.el.className = "meteor";
 
             area.appendChild(m.el);
@@ -180,7 +201,7 @@ function update() {
         m.el.style.left = m.x + "px";
         m.el.style.top = m.y + "px";
 
-        // ================= HIT PLAYER =================
+        // ================= KENA PLAYER =================
         if (
             planeX < m.x + 60 &&
             planeX + 70 > m.x &&
@@ -188,12 +209,12 @@ function update() {
             planeY + 70 > m.y
         ) {
 
-            playSound("sound/gameover.mp3", 0.7);
-
             gameOver();
+
+            return;
         }
 
-        // ================= HIT BULLET =================
+        // ================= KENA PELURU =================
         for (let j = bullets.length - 1; j >= 0; j--) {
 
             let b = bullets[j];
@@ -209,7 +230,7 @@ function update() {
 
                 scoreEl.innerText = score;
 
-                // ledakan
+                // SOUND LEDAKAN
                 playSound("sound/tembakan.mp3", 0.6);
 
                 m.el.remove();
@@ -222,15 +243,16 @@ function update() {
             }
         }
 
-        // keluar layar
+        // METEOR KELUAR
         if (m.y > area.clientHeight + 100) {
 
             m.el.remove();
+
             meteors.splice(i, 1);
         }
     }
 
-    // ================= UPDATE PLANE =================
+    // ================= UPDATE PESAWAT =================
     plane.style.left = planeX + "px";
     plane.style.top = planeY + "px";
 }
@@ -240,13 +262,61 @@ function gameOver() {
 
     gameRunning = false;
 
-    restartBtn.style.display = "block";
+    // TAMPILKAN BOX
+    gameOverBox.style.display = "block";
+
+    // SEMBUNYIKAN DULU TOMBOL
+    restartBtn.style.display = "none";
+    backHomeBtn.style.display = "none";
+
+    // SOUND GAME OVER
+    let overSound = playSound("sound/gameover.mp3", 0.7);
+
+    // SKOR AKHIR
+    finalScore.innerText = "Skor Kamu : " + score;
+
+    // TEXT RANDOM
+    let texts = [
+
+        "Pesawatmu hancur di luar angkasa 🚀",
+
+        "Meteor terlalu kuat ☄️",
+
+        "Pilot hebat tidak menyerah 🔥",
+
+        "Coba lagi dan pecahkan rekor 😎",
+
+        "Misi gagal... tapi tidak untuk selamanya 💫"
+    ];
+
+    let randomText =
+        texts[Math.floor(Math.random() * texts.length)];
+
+    gameText.innerText = randomText;
+
+    // TOMBOL MUNCUL BARENG SETELAH SOUND SELESAI
+    overSound.onended = () => {
+
+        restartBtn.style.display = "block";
+        backHomeBtn.style.display = "block";
+    };
 }
 
 // ================= RESTART =================
 restartBtn.onclick = () => {
 
     location.reload();
+};
+
+// ================= BUTTON HOME =================
+document.getElementById("homeBtn").onclick = () => {
+
+    window.location.href = "index.html";
+};
+
+backHomeBtn.onclick = () => {
+
+    window.location.href = "index.html";
 };
 
 // START GAME

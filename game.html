@@ -3,39 +3,110 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Adventure - Game</title>
 
+    <!-- RESPONSIVE HP -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>🚀 Space Adventure</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <h2>Score: <span id="score">0</span></h2>
-
-    <!-- GAME AREA -->
+    <!-- ================= GAME FRAME ================= -->
     <div id="main">
+
+        <!-- ================= TOP BAR ================= -->
+        <div id="topBar">
+
+            <!-- HOME BUTTON -->
+            <button id="homeBtn">
+                🏠 HOME
+            </button>
+
+            <!-- SCORE -->
+            <div id="scoreBox">
+                ⭐ Score:
+                <span id="score">0</span>
+            </div>
+
+        </div>
+
+        <!-- ================= GAME AREA ================= -->
         <div id="area">
 
+            <!-- PESAWAT -->
             <div id="plane"></div>
 
         </div>
 
-        <div id="gameOverScreen">
-            <h1>GAME OVER</h1>
-            <p id="finalScore">Score: 0</p>
-            <button id="restartBtn">RESTART</button>
+        <!-- ================= GAME OVER ================= -->
+        <div id="gameOverBox">
+
+            <h1>💀 GAME OVER</h1>
+
+            <!-- SCORE AKHIR -->
+            <p id="finalScore">
+                Score : 0
+            </p>
+
+            <!-- TEXT -->
+            <p id="gameText">
+                Coba lagi dan pecahkan rekor 🚀
+            </p>
+
+            <!-- BUTTON GROUP -->
+            <div class="btnGroup">
+
+                <!-- RESTART -->
+                <button id="restartBtn">
+                    🔄 RESTART
+                </button>
+
+                <!-- HOME -->
+                <button id="backHomeBtn">
+                    🏠 HOME
+                </button>
+
+            </div>
+
         </div>
 
-        <!-- restart button -->
-        <button id="restartBtn" style="display:none;">
-            🔄 Restart
+        <!-- ================= MOBILE SHOOT BUTTON ================= -->
+        <button id="shootBtn">
+            🔥
         </button>
 
     </div>
 
-    <!-- JS GAME -->
+    <!-- ================= AUDIO ================= -->
+
+    <!-- background music -->
+    <audio id="bgMusic" loop>
+        <source src="sound/background.mp3" type="audio/mp3">
+    </audio>
+
+    <!-- JS -->
     <script src="game.js"></script>
+
+    <!-- autoplay fix hp -->
+    <script>
+
+        // background music jalan setelah user sentuh layar
+        window.addEventListener("touchstart", () => {
+
+            let music =
+                document.getElementById("bgMusic");
+
+            music.volume = 0.3;
+
+            music.play().catch(() => { });
+
+        }, { once: true });
+
+    </script>
 
 </body>
 

@@ -122,7 +122,6 @@
     /* ================= TITLE ================= */
     h1 {
         font-size: 55px;
-
         font-weight: bold;
 
         margin-bottom: 15px;
@@ -132,8 +131,15 @@
                 #00aaff,
                 #ff00ff);
 
+        background-clip: text;
         -webkit-background-clip: text;
+
+        color: transparent;
         -webkit-text-fill-color: transparent;
+
+        text-shadow:
+            0 0 10px rgba(0, 255, 255, 0.5),
+            0 0 20px rgba(255, 0, 255, 0.3);
     }
 
     /* ================= DESC ================= */
@@ -143,6 +149,8 @@
         opacity: 0.8;
 
         margin-bottom: 35px;
+
+        line-height: 1.5;
     }
 
     /* ================= BUTTON ================= */
@@ -178,12 +186,22 @@
             0 0 60px rgba(0, 255, 255, 0.6);
     }
 
+    #startBtn:active {
+        transform: scale(0.96);
+    }
+
     /* ================= HP RESPONSIVE ================= */
     @media (max-width: 600px) {
 
+        body {
+            padding: 15px;
+        }
+
         #home {
-            width: 92%;
+            width: 100%;
             padding: 30px 20px;
+
+            border-radius: 25px;
         }
 
         h1 {
@@ -200,7 +218,9 @@
 
         #startBtn {
             width: 100%;
+
             padding: 16px;
+
             font-size: 18px;
         }
     }
@@ -227,16 +247,43 @@
         </button>
 
     </div>
-
     <!-- MUSIC -->
-    <audio autoplay loop>
-        <source src="sound/music.mp3" type="audio/mpeg">
+    <audio id="bgMusic" loop autoplay>
+        <source src="sound/kicau.mp3" type="audio/mpeg">
     </audio>
 
     <script>
+
+        let music = document.getElementById("bgMusic");
+
+        // volume
+        music.volume = 0.4;
+
+        // coba autoplay
+        window.addEventListener("load", () => {
+
+            let playPromise = music.play();
+
+            if (playPromise !== undefined) {
+
+                playPromise.catch(() => {
+
+                    // kalau autoplay diblok HP
+                    document.body.addEventListener("touchstart", startMusic, { once: true });
+                    document.body.addEventListener("click", startMusic, { once: true });
+
+                });
+            }
+        });
+
+        function startMusic() {
+            music.play();
+        }
+
         function startGame() {
             window.location.href = "game.html";
         }
+
     </script>
 
 </body>

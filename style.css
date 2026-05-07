@@ -4,36 +4,126 @@ body {
     color: white;
     margin: 0;
     font-family: Arial, sans-serif;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-height: 100vh;
+
+    overflow: hidden;
 }
 
 /* ================= FRAME ================= */
 #main {
     width: 400px;
     height: 500px;
-    margin: 20px auto;
+
     position: relative;
     overflow: hidden;
 
     border: 2px solid #fff;
-    border-radius: 12px;
+    border-radius: 18px;
 
     background: url("images/background.jpg") repeat-y center;
     background-size: cover;
 
-    box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+    box-shadow:
+        0 0 25px rgba(0, 255, 255, 0.4),
+        0 0 60px rgba(0, 255, 255, 0.2);
 }
 
 /* ================= AREA ================= */
 #area {
     width: 100%;
     height: 100%;
+
     position: relative;
+
     touch-action: none;
+}
+
+/* ================= TOP BAR ================= */
+#topBar {
+    width: 100%;
+
+    position: absolute;
+    top: 10px;
+    left: 0;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 12px;
+
+    box-sizing: border-box;
+
+    z-index: 999;
+}
+
+#topBar h2 {
+    color: white;
+    font-size: 24px;
+
+    margin: 0;
+
+    text-shadow: 0 0 10px cyan;
+}
+
+/* ================= BUTTON ================= */
+#homeBtn,
+#backHomeBtn,
+#restartBtn {
+    padding: 12px 18px;
+
+    border: none;
+    border-radius: 12px;
+
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+    min-height: 50px;
+}
+
+/* HOME BUTTON */
+#homeBtn,
+#backHomeBtn {
+    background: linear-gradient(90deg,
+            #00d4ff,
+            #0066ff);
+
+    box-shadow:
+        0 0 15px cyan,
+        0 0 30px rgba(0, 255, 255, 0.3);
+}
+
+/* RESTART BUTTON */
+#restartBtn {
+    background: linear-gradient(90deg,
+            red,
+            #ff4444);
+
+    box-shadow:
+        0 0 15px red,
+        0 0 30px rgba(255, 0, 0, 0.3);
+}
+
+#homeBtn:hover,
+#backHomeBtn:hover,
+#restartBtn:hover {
+    transform: scale(1.05);
 }
 
 /* ================= PLANE ================= */
 #plane {
     position: absolute;
+
     width: 80px;
     height: 90px;
 
@@ -45,98 +135,206 @@ body {
 
     z-index: 10;
 
-    animation: planeFire 0.2s infinite steps(2);
+    animation: planeFire 0.2s infinite alternate;
 }
 
 @keyframes planeFire {
     0% {
         background-image: url("images/pesawat.jpeg");
-        /* tanpa api */
+        transform: translateY(0px);
     }
 
     100% {
         background-image: url("images/pesawat2.jpeg");
-        /* ada api */
+        transform: translateY(-2px);
     }
 }
 
-/* ================= METEOR ANIMATED ================= */
+/* ================= METEOR ================= */
 .meteor {
     position: absolute;
+
     width: 60px;
     height: 70px;
 
     background: url("images/meteor.png") no-repeat center;
     background-size: contain;
 
-    animation: meteorFire 0.18s infinite steps(2);
+    z-index: 5;
 
+    animation: meteorFire 0.18s infinite alternate;
 }
 
 @keyframes meteorFire {
     0% {
         background-image: url("images/meteor.png");
+        transform: rotate(-2deg);
     }
 
     100% {
         background-image: url("images/meteor1.png");
+        transform: rotate(2deg);
     }
 }
-
 
 /* ================= BULLET ================= */
 .bullet {
     position: absolute;
+
     width: 6px;
-    height: 12px;
+    height: 14px;
 
     background: yellow;
-    border-radius: 3px;
-    box-shadow: 0 0 10px yellow;
+
+    border-radius: 5px;
+
+    box-shadow:
+        0 0 10px yellow,
+        0 0 20px orange;
 
     z-index: 6;
+
+    animation: bulletGlow 0.2s infinite alternate;
 }
 
-/* ================= RESTART ================= */
-#restartBtn {
+@keyframes bulletGlow {
+    from {
+        transform: scaleY(1);
+    }
+
+    to {
+        transform: scaleY(1.2);
+    }
+}
+
+/* ================= GAME OVER BOX ================= */
+#gameOverBox {
     position: absolute;
+
     top: 50%;
     left: 50%;
+
     transform: translate(-50%, -50%);
+
+    width: 85%;
+    max-width: 320px;
+
+    padding: 30px 20px;
+
+    background: rgba(0, 0, 0, 0.88);
+
+    border: 2px solid cyan;
+    border-radius: 22px;
+
+    text-align: center;
+
+    z-index: 1000;
+
     display: none;
 
-    padding: 12px 25px;
-    font-size: 18px;
+    box-sizing: border-box;
 
-    background: red;
-    color: white;
-    border: none;
-    border-radius: 10px;
+    animation: popup 0.25s ease;
 
-    cursor: pointer;
-    z-index: 999;
-
-    box-shadow: 0 0 25px red;
+    box-shadow:
+        0 0 25px cyan,
+        0 0 50px rgba(0, 255, 255, 0.3);
 }
 
-#restartBtn:hover {
-    transform: translate(-50%, -50%) scale(1.1);
+@keyframes popup {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+#gameOverBox h1 {
+    color: red;
+
+    margin-bottom: 15px;
+
+    font-size: 38px;
+
+    text-shadow: 0 0 10px red;
+}
+
+#finalScore {
+    font-size: 26px;
+
+    margin-bottom: 10px;
+
+    color: cyan;
+
+    font-weight: bold;
+}
+
+#gameText {
+    opacity: 0.85;
+
+    margin-bottom: 25px;
+
+    font-size: 16px;
+}
+
+/* ================= BUTTON GROUP ================= */
+.btnGroup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    width: 100%;
+}
+
+.btnGroup button {
+    flex: 1;
 }
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 500px) {
+
+    body {
+        padding: 10px;
+    }
+
     #main {
-        width: 95%;
-        height: 70vh;
+        width: 100%;
+        height: 75vh;
     }
 
     #plane {
         width: 65px;
-        height: 80px;
+        height: 75px;
     }
 
     .meteor {
         width: 45px;
-        height: 60px;
+        height: 55px;
+    }
+
+    #gameOverBox {
+        width: 92%;
+        padding: 25px 15px;
+    }
+
+    #topBar h2 {
+        font-size: 18px;
+    }
+
+    .btnGroup {
+        flex-direction: row;
+    }
+
+    #homeBtn,
+    #backHomeBtn,
+    #restartBtn {
+        font-size: 14px;
+        padding: 12px;
     }
 }
